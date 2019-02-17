@@ -29,3 +29,8 @@ add_vmm_executable(
     integration_cpuid_emulation
     SOURCES integration_cpuid_emulation.cpp
 )
+
+add_vmm_executable(
+    integration_cpuid_pass_through
+    SOURCES integration_cpuid_pass_through.cpp
+)

@@ -23,18 +23,42 @@
 
 using namespace bfvmm::intel_x64;
 
-bool test_emulate_handler(vcpu_t vcpu, cpuid::info_t &info)
+static uint64_t g_rax = 0;
+static uint64_t g_rbx = 0;
+static uint64_t g_rcx = 0;
+static uint64_t g_rdx = 0;
+
+bool test_pass_through_handler(vcpu_t vcpu, cpuid::info_t &info)
 {
     bfignored(info);
 
-    cpuid::emulate(vcpu, 0xBADC0FFE, vcpu->rcx(), vcpu->rcx(), vcpu->rcx());
+    cpuid::pass_through(vcpu);
+
+    g_rax = vcpu->rax();
+    g_rbx = vcpu->rbx();
+    g_rcx = vcpu->rcx();
+    g_rdx = vcpu->rdx();
+
+    return true;
+}
+
+bool test_value_matches_handler(vcpu_t vcpu, cpuid::info_t &info)
+{
+    bfignored(info);
+
+    cpuid::emulate(vcpu, g_rax, g_rbx, g_rcx, g_rdx);
 
     return true;
 }
 
 bool vmm_main(vcpu_t vcpu)
 {
-    auto handler = cpuid::handler(test_emulate_handler);
+    // Pass through leaf 0x8086
+    auto handler = cpuid::handler(test_pass_through_handler);
+    cpuid::handle(vcpu, 0x8086, handler);
+
+    // Expose the value that was supposed to be passed through at leaf 0xF00D
+    handler = cpuid::handler(test_value_matches_handler);
     cpuid::handle(vcpu, 0xF00D, handler);
 
     return true;

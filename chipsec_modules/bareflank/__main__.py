@@ -28,6 +28,7 @@ except BaseException, be:
 
 cs.load_module("bareflank/cpuid/test_ack.py", argv)
 cs.load_module("bareflank/cpuid/test_emulation.py", argv)
+cs.load_module("bareflank/cpuid/test_pass_through.py", argv)
 cs.load_module("bareflank/cpuid/test_repeat_vmm_init.py", argv)
 
 # Run

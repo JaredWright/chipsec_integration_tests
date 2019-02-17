@@ -5,7 +5,7 @@ A chipsec module to test Bareflank CPUID emulation
 from bareflank.base_module import *
 from chipsec.hal.cpuid import *
 
-_MODULE_NAME = 'CPUID Emulation Integration Test'
+_MODULE_NAME = 'CPUID Emulation Test'
 TAGS = ["BAREFLANK"]
 
 class test_emulation(BareflankBaseModule):
