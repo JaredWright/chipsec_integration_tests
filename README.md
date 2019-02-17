@@ -14,7 +14,7 @@ the chipsec modules.
 ## WARNING
 
 Do not build or run this extension on a production environment! Chipsec is
-inteded as a testing tool that intentionally opens massive security holes in
+intended to be a testing tool that intentionally opens massive security holes in
 your platform to perform invasive testing.
 
 ## Usage
@@ -24,13 +24,13 @@ chipsec-specific dependencies:
 
 ```
 apt-get install build-essential python-dev python-setuptools python gcc
-apt-get install linux-header-$(uname -r) nasm
+apt-get install linux-headers-$(uname -r) nasm
 ```
 
 To build and run:
 ```
 git clone --recursive https://github.com/JaredWright/chipsec_integration_tests
-mkdir build && cd build
+mkdir build; cd build
 cmake ../chipsec_integration_tests/hypervisor -DCONFIG=<full/path/to/this/repo>/config.cmake
 make -j<#-of-cores>
 make chipsec_test
