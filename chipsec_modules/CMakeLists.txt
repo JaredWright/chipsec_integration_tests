@@ -20,12 +20,24 @@
 # SOFTWARE.
 
 cmake_minimum_required(VERSION 3.6)
-project(cpuid_integration_test C CXX)
+project(chipsec_modules C CXX)
 
 include(${SOURCE_CMAKE_DIR}/project.cmake)
 init_project()
 
-add_vmm_executable(
-    cpuid_emulation_test
-    SOURCES cpuid/emulation_test.cpp
+file(GLOB_RECURSE CHIPSEC_MODULES_SRC_FILES "*/*.py")
+
+set(CHIPSEC_MODULES_STAMP_DIR ${CMAKE_CURRENT_BINARY_DIR}/stamp)
+set(CHIPSEC_MODULES_STAMP ${CHIPSEC_MODULES_STAMP_DIR}/chipsec_output.stamp)
+file(MAKE_DIRECTORY ${CHIPSEC_MODULES_STAMP_DIR})
+
+add_custom_command(
+    COMMAND cmake -E touch ${CHIPSEC_MODULES_STAMP}
+    OUTPUT ${CHIPSEC_MODULES_STAMP}
+    DEPENDS ${CHIPSEC_MODULES_SRC_FILES}
+    COMMENT "Updating chipsec modules"
 )
+
+add_custom_target(chipsec_modules ALL DEPENDS ${CHIPSEC_MODULES_STAMP})
+
+install(DIRECTORY bareflank DESTINATION bin/chipsec_modules)

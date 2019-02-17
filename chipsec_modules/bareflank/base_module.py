@@ -5,6 +5,7 @@ Provides helpers for loading/unloading VMMs, etc
 """
 
 import subprocess
+import os
 
 from chipsec.module_common import *
 
@@ -20,11 +21,18 @@ class BareflankBaseModule(BaseModule):
     def run(self, module_argv):
         pass
 
-    def load_vmm(self, module_argv):
+    def load_vmm(self, module_argv, vmm_name):
+        if len(module_argv) < 2:
+            raise Exception("Failed to load vmm, no BFM or VMM paths specified")
+
         bfm_path = str(module_argv[0])
-        vmm_path = str(module_argv[1])
-        ret = subprocess.call([bfm_path, "load", vmm_path])
-        ret = subprocess.call([bfm_path, "start"])
+        vmm_dir = str(module_argv[1])
+        vmm_path = os.path.join(vmm_dir, str(vmm_name))
+        if subprocess.call([bfm_path, "load", vmm_path]):
+            raise Exception("Failed to load vmm: " + str(vmm_path))
+
+        if subprocess.call([bfm_path, "start"]):
+            raise Exception("Failed to load vmm: " + str(vmm_path))
 
     def unload_vmm(self, module_argv):
         bfm_path = str(module_argv[0])

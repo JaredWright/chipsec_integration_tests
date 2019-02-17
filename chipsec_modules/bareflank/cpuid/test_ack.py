@@ -1,25 +1,25 @@
 """
-A chipsec module to test Bareflank CPUID emulation
+A chipsec module to test Bareflank CPUID ACK leaf
 """
 
-from chipsec.modules.bareflank.base_module import *
+from bareflank.base_module import *
 from chipsec.hal.cpuid import *
 
-_MODULE_NAME = 'CPUID Emulation Integration Test'
+_MODULE_NAME = 'CPUID ACK Integration Test'
 TAGS = ["BAREFLANK"]
 
-class test_emulation(BareflankBaseModule):
+class test_ack(BareflankBaseModule):
     def __init__(self):
         BareflankBaseModule.__init__(self)
 
         # In/out values for CPUID instruction
-        self.eax = 0xF00D
+        self.eax = 0x4BF00000
         self.ebx = 0x0
         self.ecx = 0x0
         self.edx = 0x0
 
         # Expected output values
-        self.expected_eax = 0xBEEF
+        self.expected_eax = 0x4BF00001
         self.expected_ebx = 0x0
         self.expected_ecx = 0x0
         self.expected_edx = 0x0
@@ -27,11 +27,11 @@ class test_emulation(BareflankBaseModule):
     def run(self, module_argv):
         self.logger.start_test(_MODULE_NAME)
 
-        self.load_vmm(module_argv)
+        self.load_vmm(module_argv, "bfvmm_static")
 
         self._print_run()
-        cpuid_interface = CpuID(self.cs)
-        (self.eax, self.ebx, self.ecx, self.edx) = cpuid_interface.cpuid(self.eax, self.ecx)
+        cpuid = CpuID(self.cs)
+        (self.eax, self.ebx, self.ecx, self.edx) = cpuid.cpuid(self.eax, self.ecx)
 
         self.unload_vmm(module_argv)
 

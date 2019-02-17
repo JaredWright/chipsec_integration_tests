@@ -20,28 +20,16 @@
 # SOFTWARE.
 
 include(${CMAKE_CURRENT_LIST_DIR}/targets.cmake)
-include(${CMAKE_CURRENT_LIST_DIR}/macros.cmake)
 
 include_dependency(CMAKE_CURRENT_LIST_DIR chipsec)
 
 userspace_extension(
     chipsec_modules
     DEPENDS chipsec
-    SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/chipsec
+    SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/chipsec_modules
 )
 
 vmm_extension(
     chipsec_vmms
-    SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/src
-)
-
-chipsec_test(cpuid_emulation
-    VMM_EXECUTABLE cpuid_emulation_test
-    CHIPSEC_MODULE bareflank.cpuid.test_emulation
-    VERBOSE
-)
-
-chipsec_test(cpuid_ack
-    VMM_EXECUTABLE bfvmm
-    CHIPSEC_MODULE bareflank.cpuid.test_ack
+    SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/chipsec_vmms
 )
