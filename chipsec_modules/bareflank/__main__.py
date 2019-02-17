@@ -20,13 +20,15 @@ except oshelper.OsHelperError as os_helper_error:
 except BaseException, be:
     logger().log_bad(traceback.format_exc())
 
-# Import all python files that start with test_ as chipsec modules
+# TODO: Figure out a way to load all modules automatically
+# Doesn't work: Import all python files that start with test_ as chipsec modules
 #  for root, dirnames, filenames in os.walk(this_dir):
 #      for filename in fnmatch.filter(filenames, 'test_*.py'):
 #          cs.load_module(os.path.join(root, filename), argv)
+
 cs.load_module("bareflank/cpuid/test_ack.py", argv)
 cs.load_module("bareflank/cpuid/test_emulation.py", argv)
-cs.load_module("bareflank/cpuid/test_another_cpuid.py", argv)
+cs.load_module("bareflank/cpuid/test_repeat_vmm_init.py", argv)
 
 # Run
 cs.run_loaded_modules()

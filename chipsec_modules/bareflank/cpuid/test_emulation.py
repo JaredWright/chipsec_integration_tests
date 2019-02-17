@@ -12,65 +12,43 @@ class test_emulation(BareflankBaseModule):
     def __init__(self):
         BareflankBaseModule.__init__(self)
 
-        # In/out values for CPUID instruction
-        self.eax = 0xF00D
-        self.ebx = 0x0
-        self.ecx = 0x0
-        self.edx = 0x0
-
-        # Expected output values
-        self.expected_eax = 0xBEEF
-        self.expected_ebx = 0x0
-        self.expected_ecx = 0x0
-        self.expected_edx = 0x0
+        # Sets to True if any test case fails
+        self._module_failed = False
 
     def run(self, module_argv):
         self.logger.start_test(_MODULE_NAME)
 
         self.load_vmm(module_argv, "integration_cpuid_emulation_static")
 
-        self._print_run()
-        cpuid_interface = CpuID(self.cs)
-        (self.eax, self.ebx, self.ecx, self.edx) = cpuid_interface.cpuid(self.eax, self.ecx)
+        self._test_zeros_preserved()
+        self._test_ones_preserved()
+        self._test_register_mask()
 
         self.unload_vmm(module_argv)
 
-        if self.eax == self.expected_eax  \
-        and self.ebx == self.expected_ebx \
-        and self.ecx == self.expected_ecx \
-        and self.edx == self.expected_edx:
-            self._print_pass()
-            return ModuleResult.PASSED
-        else:
-            self._print_fail()
+        if self._module_failed == True:
+            self.logger.log_failed(_MODULE_NAME)
             return ModuleResult.FAILED
+        else:
+            self.logger.log_passed(_MODULE_NAME)
+            return ModuleResult.PASSED
 
-    def _print_run(self):
-        msg = "CPUID".ljust(13)
-        msg += 'eax=0x{0:0{1}X} '.format(self.eax, 8)
-        msg += 'ecx=0x{0:0{1}X} '.format(self.ecx, 8)
-        self.logger.log_good(msg)
+    def _test_zeros_preserved(self):
+        result = self.cpuid(0xF00D, 0x0)
+        expected = (0xBADC0FFE, 0, 0, 0)
+        if not self.cpuid_check_result(result, expected):
+            self._module_failed = True
 
-    def _print_pass(self):
-        msg = "Returned:".ljust(13)
-        msg += 'eax=0x{0:0{1}X} '.format(self.eax, 8)
-        msg += 'ebx=0x{0:0{1}X} '.format(self.ebx, 8)
-        msg += 'ecx=0x{0:0{1}X} '.format(self.ecx, 8)
-        msg += 'edx=0x{0:0{1}X} '.format(self.edx, 8)
+    def _test_ones_preserved(self):
+        result = self.cpuid(0xF00D, 0xFFFFFFFF)
+        expected = (0xBADC0FFE, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF)
+        if not self.cpuid_check_result(result, expected):
+            self._module_failed = True
 
-        self.logger.log_good(msg)
+    def _test_register_mask(self):
+        result = self.cpuid(0xF00D, 0xFFFFFFFFFFFFFFFF)
+        # BUG: Chipsec doesn't mask upper bits of rcx after calling CPUID
+        expected = (0xBADC0FFE, 0xFFFFFFFF, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFF)
+        if not self.cpuid_check_result(result, expected):
+            self._module_failed = True
 
-    def _print_fail(self):
-        msg = "Returned:".ljust(13)
-        msg += 'eax=0x{0:0{1}X} '.format(self.eax, 8)
-        msg += 'ebx=0x{0:0{1}X} '.format(self.ebx, 8)
-        msg += 'ecx=0x{0:0{1}X} '.format(self.ecx, 8)
-        msg += 'edx=0x{0:0{1}X} '.format(self.edx, 8)
-        self.logger.log_bad(msg)
-
-        msg = "Expected:".ljust(13)
-        msg += 'eax=0x{0:0{1}X} '.format(self.expected_eax, 8)
-        msg += 'ebx=0x{0:0{1}X} '.format(self.expected_ebx, 8)
-        msg += 'ecx=0x{0:0{1}X} '.format(self.expected_ecx, 8)
-        msg += 'edx=0x{0:0{1}X} '.format(self.expected_edx, 8)
-        self.logger.log_bad(msg)

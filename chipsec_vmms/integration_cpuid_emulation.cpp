@@ -23,25 +23,20 @@
 
 using namespace bfvmm::intel_x64;
 
-bool my_cpuid_handler(vcpu_t vcpu, cpuid::info_t &info)
+bool test_emulate_handler(vcpu_t vcpu, cpuid::info_t &info)
 {
     bfignored(vcpu);
     bfignored(info);
 
-    bfdebug_info(0, "This handler gets called when a guest runs CPUID 0xF00D");
-    bfdebug_info(0, "The guest will observe the result 0xBEEF in register rax");
-    vcpu->set_rax(0xBEEF);
-    info.ignore_write = true;
+    cpuid::emulate(vcpu, 0xBADC0FFE, vcpu->rcx(), vcpu->rcx(), vcpu->rcx());
 
     return true;
 }
 
 bool vmm_main(vcpu_t vcpu)
 {
-    auto handler = cpuid::handler(my_cpuid_handler);
-    cpuid::emulate(vcpu, 0xF00D, handler);
-
-    bfdebug_info(0, "CPUID integration test initialized");
+    auto handler = cpuid::handler(test_emulate_handler);
+    cpuid::handle(vcpu, 0xF00D, handler);
 
     return true;
 }
