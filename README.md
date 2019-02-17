@@ -1,5 +1,7 @@
 # Chipsec-based integration tests for the Bareflank Hypervisor
 
+![BareflankLovesChipsec](https://raw.githubusercontent.com/jaredwright/chipsec_integration_tests/master/BareflankLovesChipsec.png)
+
 This repository contains a Bareflank extension that aims to prove-out the
 concept of using [chipsec](https://github.com/chipsec/chipsec)
 as an integration testing tool for Bareflank-based VMMs.
