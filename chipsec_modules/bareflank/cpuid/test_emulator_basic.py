@@ -5,10 +5,10 @@ A chipsec module to test Bareflank CPUID emulation
 from bareflank.base_module import *
 from chipsec.hal.cpuid import *
 
-_MODULE_NAME = 'CPUID Emulation Test'
+_MODULE_NAME = 'CPUID Basic Emulation Test'
 TAGS = ["BAREFLANK"]
 
-class test_emulation(BareflankBaseModule):
+class test_emulator_basic(BareflankBaseModule):
     def __init__(self):
         BareflankBaseModule.__init__(self)
 
@@ -18,7 +18,7 @@ class test_emulation(BareflankBaseModule):
     def run(self, module_argv):
         self.logger.start_test(_MODULE_NAME)
 
-        self.load_vmm(module_argv, "integration_cpuid_emulation_static")
+        self.load_vmm(module_argv, "integration_cpuid_emulator_basic_static")
 
         self._test_zeros_preserved()
         self._test_ones_preserved()
@@ -35,20 +35,19 @@ class test_emulation(BareflankBaseModule):
 
     def _test_zeros_preserved(self):
         result = self.cpuid(0xF00D, 0x0)
-        expected = (0xBADC0FFE, 0, 0, 0)
+        expected = (0xBEEF, 0, 0, 0)
         if not self.cpuid_check_result(result, expected):
             self._module_failed = True
 
     def _test_ones_preserved(self):
         result = self.cpuid(0xF00D, 0xFFFFFFFF)
-        expected = (0xBADC0FFE, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF)
+        expected = (0xBEEF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF)
         if not self.cpuid_check_result(result, expected):
             self._module_failed = True
 
     def _test_register_mask(self):
         result = self.cpuid(0xF00D, 0xFFFFFFFFFFFFFFFF)
         # BUG: Chipsec doesn't mask upper bits of rcx after calling CPUID
-        expected = (0xBADC0FFE, 0xFFFFFFFF, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFF)
+        expected = (0xBEEF, 0xFFFFFFFF, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFF)
         if not self.cpuid_check_result(result, expected):
             self._module_failed = True
-

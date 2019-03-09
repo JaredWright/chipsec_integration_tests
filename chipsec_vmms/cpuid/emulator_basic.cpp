@@ -31,18 +31,18 @@ using namespace bfvmm::intel_x64;
 //  - Copies the subleaf (ecx) that caused the vmexit into [ebx, ecx, edx].
 //
 
-bool emulator(vcpu_t *vcpu)
+bool emulator(vcpu *vcpu)
 {
-    auto subleaf = 0xBADC0FFE; // TODO: look this up with whatever API is provided
+    auto subleaf = cpuid::get_subleaf(vcpu);
     cpuid::emulate(vcpu, 0xBEEF, subleaf, subleaf, subleaf);
 
     vcpu->advance();
     return true;
 }
 
-bool vcpu_init(vcpu_t *vcpu)
+bool vcpu_init_nonroot(vcpu *vcpu)
 {
-    cpuid::add_emulator(vcpu, 0xF00D, cpuid::handler(emulator));
+    cpuid::add_emulator(vcpu, 0xF00D, handler_delegate(emulator));
 
     return true;
 }

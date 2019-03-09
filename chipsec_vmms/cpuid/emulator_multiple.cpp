@@ -32,44 +32,44 @@ using namespace bfvmm::intel_x64;
 // not be called.
 //
 
-bool emulator_1(vcpu_t *vcpu)
+bool emulator_1(vcpu *vcpu)
 {
     vcpu->set_rax(0xBEEF);
     return false;
 }
 
-bool emulator_2(vcpu_t *vcpu)
+bool emulator_2(vcpu *vcpu)
 {
     vcpu->set_rbx(0xA55A);
     return false;
 }
 
-bool emulator_3(vcpu_t *vcpu)
+bool emulator_3(vcpu *vcpu)
 {
-    vcpu->set_rcx(0x5AA5);
+    vcpu->set_rcx(0x5AA5AA55);
     return false;
 }
 
-bool emulator_4(vcpu_t *vcpu)
+bool emulator_4(vcpu *vcpu)
 {
     vcpu->set_rdx(0xFFFFFFFF);
     vcpu->advance();
     return true;
 }
 
-bool emulator_5(vcpu_t *vcpu)
+bool emulator_5(vcpu *vcpu)
 {
     vcpu->set_rax(0xDEAD);
     return false;
 }
 
-bool vcpu_init(vcpu_t *vcpu)
+bool vcpu_init_nonroot(vcpu *vcpu)
 {
-    cpuid::add_emulator(vcpu, 0xF00D, cpuid::handler(emulator_5));
-    cpuid::add_emulator(vcpu, 0xF00D, cpuid::handler(emulator_4));
-    cpuid::add_emulator(vcpu, 0xF00D, cpuid::handler(emulator_3));
-    cpuid::add_emulator(vcpu, 0xF00D, cpuid::handler(emulator_2));
-    cpuid::add_emulator(vcpu, 0xF00D, cpuid::handler(emulator_1));
+    cpuid::add_emulator(vcpu, 0xF00D, handler_delegate(emulator_5));
+    cpuid::add_emulator(vcpu, 0xF00D, handler_delegate(emulator_4));
+    cpuid::add_emulator(vcpu, 0xF00D, handler_delegate(emulator_3));
+    cpuid::add_emulator(vcpu, 0xF00D, handler_delegate(emulator_2));
+    cpuid::add_emulator(vcpu, 0xF00D, handler_delegate(emulator_1));
 
     return true;
 }

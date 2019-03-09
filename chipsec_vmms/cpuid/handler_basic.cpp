@@ -35,25 +35,26 @@ using namespace bfvmm::intel_x64;
 // cpuid leaf
 //
 
-static uint64_t g_counter = 0;
+uint64_t g_counter = 0;
 
-bool handler(vcpu_t *vcpu)
+bool handler(vcpu *vcpu)
 {
-    counter++;
+    bfignored(vcpu);
+    g_counter++;
     return false;
 }
 
-bool emulator(vcpu_t *vcpu)
+bool emulator(vcpu *vcpu)
 {
     cpuid::emulate(vcpu, g_counter, 0, 0, 0);
     vcpu->advance();
     return true;
 }
 
-bool vcpu_init(vcpu_t *vcpu)
+bool vcpu_init_nonroot(vcpu *vcpu)
 {
-    cpuid::add_handler(vcpu, 0x8086, cpuid::handler(handler));
-    cpuid::add_emulator(vcpu, 0xF00D, cpuid::handler(emulator));
+    cpuid::add_handler(vcpu, 0x0, handler_delegate(handler));
+    cpuid::add_emulator(vcpu, 0xF00D, handler_delegate(emulator));
 
     return true;
 }

@@ -26,10 +26,24 @@ except BaseException, be:
 #      for filename in fnmatch.filter(filenames, 'test_*.py'):
 #          cs.load_module(os.path.join(root, filename), argv)
 
+# CPUID Tests
 cs.load_module("bareflank/cpuid/test_ack.py", argv)
-cs.load_module("bareflank/cpuid/test_emulation.py", argv)
-cs.load_module("bareflank/cpuid/test_pass_through.py", argv)
 cs.load_module("bareflank/cpuid/test_repeat_vmm_init.py", argv)
+cs.load_module("bareflank/cpuid/test_emulator_and_handler.py", argv)
+cs.load_module("bareflank/cpuid/test_emulator_basic.py", argv)
+cs.load_module("bareflank/cpuid/test_emulator_does_not_leak_hardware.py", argv)
+cs.load_module("bareflank/cpuid/test_emulator_multiple.py", argv)
+cs.load_module("bareflank/cpuid/test_emulator_inputs_preserved.py", argv)
+cs.load_module("bareflank/cpuid/test_handler_basic.py", argv)
+cs.load_module("bareflank/cpuid/test_handler_inputs_preserved.py", argv)
+cs.load_module("bareflank/cpuid/test_handler_multiple.py", argv)
+cs.load_module("bareflank/cpuid/test_handler_vcpu_matches_hardware.py", argv)
+# TODO: The following test intentionally tries to cause an unhandled exception.
+# Figure out how to recover from an unhandled vmexit to run this test safely
+#  cs.load_module("bareflank/cpuid/test_emulator_and_handler_exception.py", argv)
+
+#  MSR Tests
+#  cs.load_module("bareflank/msr/test_rdmsr_emulate.py", argv)
 
 # Run
 cs.run_loaded_modules()

@@ -32,23 +32,23 @@ using namespace bfvmm::intel_x64;
 //  - The handler should never be called
 //
 
-bool emulator(vcpu_t *vcpu)
+bool emulator(vcpu *vcpu)
 {
     vcpu->set_rax(0xBEEF);
     vcpu->advance();
     return true;
 }
 
-bool handler(vcpu_t *vcpu)
+bool handler(vcpu *vcpu)
 {
     vcpu->set_rax(0xDEAD);
     return false;
 }
 
-bool vcpu_init(vcpu_t *vcpu)
+bool vcpu_init_nonroot(vcpu *vcpu)
 {
-    cpuid::add_emulator(vcpu, 0xF00D, cpuid::handler(emulator));
-    cpuid::add_handler(vcpu, 0xF00D, cpuid::handler(handler));
+    cpuid::add_emulator(vcpu, 0xF00D, handler_delegate(emulator));
+    cpuid::add_handler(vcpu, 0xF00D, handler_delegate(handler));
 
     return true;
 }

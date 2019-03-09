@@ -32,33 +32,37 @@ using namespace bfvmm::intel_x64;
 //
 //  - Save the vcpu state associated with cpuid instruction "outputs"
 //      (i.e. eax, ebx, ecx, edx).
-//  - Run cpuid::execute(vcpu) to re-populate the vcpu with hardware state.
+//  - Re-run CPUID manually and re-populate the vcpu with hardware state.
 //      This should result in the vcpu's registers retaining the same values 
 //  - Return true to end the handler chain
 // 
-// The "original" vcpu state at the handler's entry point is exposed through a
+// The "original" vcpu state (at the handler's entry point) is exposed through a
 // sperate cpuid emulator for comparison
 //
 
-static uint64_t g_rax = 0;
-static uint64_t g_rbx = 0;
-static uint64_t g_rcx = 0;
-static uint64_t g_rdx = 0;
+uint64_t g_rax = 0;
+uint64_t g_rbx = 0;
+uint64_t g_rcx = 0;
+uint64_t g_rdx = 0;
 
-bool handler(vcpu_t *vcpu)
+bool handler(vcpu *vcpu)
 {
     g_rax = vcpu->rax();
     g_rbx = vcpu->rbx();
     g_rcx = vcpu->rcx();
     g_rdx = vcpu->rdx();
 
+    vcpu->set_rax(cpuid::get_leaf(vcpu));
+    vcpu->set_rbx(0);
+    vcpu->set_rcx(cpuid::get_subleaf(vcpu));
+    vcpu->set_rdx(0);
     cpuid::execute(vcpu);
 
     vcpu->advance();
     return true;
 }
 
-bool emulator(vcpu_t *vcpu)
+bool emulator(vcpu *vcpu)
 {
     vcpu->set_rax(g_rax);
     vcpu->set_rbx(g_rbx);
@@ -69,10 +73,10 @@ bool emulator(vcpu_t *vcpu)
     return true;
 }
 
-bool vcpu_init(vcpu_t *vcpu)
+bool vcpu_init_nonroot(vcpu *vcpu)
 {
-    cpuid::add_handler(vcpu, 0x8086, cpuid::handler(handler));
-    cpuid::add_emulator(vcpu, 0xF00D, cpuid::handler(emulator));
+    cpuid::add_handler(vcpu, 0x0, handler_delegate(handler));
+    cpuid::add_emulator(vcpu, 0xF00D, handler_delegate(emulator));
 
     return true;
 }

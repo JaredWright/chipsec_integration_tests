@@ -31,36 +31,36 @@ using namespace bfvmm::intel_x64;
 // to the base cpuid handler to complete any built-in behaviors.
 //
 
-bool handler_1(vcpu_t *vcpu)
+bool handler_1(vcpu *vcpu)
 {
     vcpu->set_rax(0xBEEF);
     return false;
 }
 
-bool handler_2(vcpu_t *vcpu)
+bool handler_2(vcpu *vcpu)
 {
-    vcpu->set_rbx(0x5A);
+    vcpu->set_rbx(0xA55A);
     return false;
 }
 
-bool handler_3(vcpu_t *vcpu)
+bool handler_3(vcpu *vcpu)
 {
-    vcpu->set_rcx(0xA55A);
+    vcpu->set_rcx(0x5AA5AA55);
     return false;
 }
 
-bool handler_4(vcpu_t *vcpu)
+bool handler_4(vcpu *vcpu)
 {
     vcpu->set_rdx(0xFFFFFFFF);
     return false;
 }
 
-bool vcpu_init(vcpu_t *vcpu)
+bool vcpu_init_nonroot(vcpu *vcpu)
 {
-    cpuid::add_handler(vcpu, 0xF00D, cpuid::handler(handler_4));
-    cpuid::add_handler(vcpu, 0xF00D, cpuid::handler(handler_3));
-    cpuid::add_handler(vcpu, 0xF00D, cpuid::handler(handler_2));
-    cpuid::add_handler(vcpu, 0xF00D, cpuid::handler(handler_1));
+    cpuid::add_handler(vcpu, 0xF00D, handler_delegate(handler_4));
+    cpuid::add_handler(vcpu, 0xF00D, handler_delegate(handler_3));
+    cpuid::add_handler(vcpu, 0xF00D, handler_delegate(handler_2));
+    cpuid::add_handler(vcpu, 0xF00D, handler_delegate(handler_1));
 
     return true;
 }

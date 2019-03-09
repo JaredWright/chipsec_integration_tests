@@ -30,48 +30,21 @@ using namespace bfvmm::intel_x64;
 // This tests that a cpuid emulator does not transparently leak values from
 // hardware without explicitly trying to do so. To test this property:
 //
-//  - Register one emulator for a real CPUID leaf.
-//  - The emulator executes a cpuid instruction manually for the leaf/subleaf
-//      that caused the the vmexit
-//  - The emulator saves the values reported by hardware, taking care not to set
-//      any vcpu registers in the process
-//  - The emulator returns true to end the handler chain.
+//  - Register one emulator for a real CPUID leaf (0 = Basic CPUID Information)
+//  - The emulator does nothing, and returns true to end the handler chain.
 //
-//  The result of the real cpuid instruction is exposed through a seperate cpuid
-//  emulator for comparison
+//  The observer of the emulated CPUID leaf should not see any values returned
+//  through eax, ebx, ecx, or edx.
 //
 
-static uint64_t g_rax = 0xBADC0FFE;
-static uint64_t g_rbx = 0xBADC0FFE;
-static uint64_t g_rcx = 0xBADC0FFE;
-static uint64_t g_rdx = 0xBADC0FFE;
-
-bool emulator_1(vcpu_t *vcpu)
+bool emulator_1(vcpu *vcpu)
 {
-    auto leaf = 0xBADC0FFE;     // TODO: look this up with whatever API is provided
-    auto subleaf = 0xBADC0FFE;  // TODO: look this up with whatever API is provided
-    auto ret = ::x64::cpuid::get(leaf, 0, subleaf, 0);
-
-    g_rax = ret.rax;
-    g_rbx = ret.rbx;
-    g_rcx = ret.rcx;
-    g_rdx = ret.rdx;
-
     vcpu->advance();
     return true;
 }
 
-bool emulator_2(vcpu_t *vcpu)
+bool vcpu_init_nonroot(vcpu *vcpu)
 {
-    cpuid::emulate(vcpu, g_rax, g_rbx, g_rcx, g_rdx);
-    vcpu->advance();
-    return true;
-}
-
-bool vcpu_init(vcpu_t *vcpu)
-{
-    cpuid::add_emulator(vcpu, 0x8086, cpuid::handler(emulator_1));
-    cpuid::add_emulator(vcpu, 0xF00D, cpuid::handler(emulator_2));
-
+    cpuid::add_emulator(vcpu, 0, handler_delegate(emulator_1));
     return true;
 }

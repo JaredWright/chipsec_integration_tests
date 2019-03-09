@@ -26,11 +26,51 @@ include(${SOURCE_CMAKE_DIR}/project.cmake)
 init_project()
 
 add_vmm_executable(
-    integration_cpuid_emulation
-    SOURCES integration_cpuid_emulation.cpp
+    integration_cpuid_emulator_and_handler
+    SOURCES cpuid/emulator_and_handler.cpp
 )
 
 add_vmm_executable(
-    integration_cpuid_pass_through
-    SOURCES integration_cpuid_pass_through.cpp
+    integration_cpuid_emulator_and_handler_exception
+    SOURCES cpuid/emulator_and_handler_exception.cpp
+)
+
+add_vmm_executable(
+    integration_cpuid_emulator_basic
+    SOURCES cpuid/emulator_basic.cpp
+)
+
+add_vmm_executable(
+    integration_cpuid_emulator_does_not_leak_hardware
+    SOURCES cpuid/emulator_does_not_leak_hardware.cpp
+)
+
+add_vmm_executable(
+    integration_cpuid_emulator_inputs_preserved
+    SOURCES cpuid/emulator_inputs_preserved.cpp
+)
+
+add_vmm_executable(
+    integration_cpuid_emulator_multiple
+    SOURCES cpuid/emulator_multiple.cpp
+)
+
+add_vmm_executable(
+    integration_cpuid_handler_basic
+    SOURCES cpuid/handler_basic.cpp
+)
+
+add_vmm_executable(
+    integration_cpuid_handler_inputs_preserved
+    SOURCES cpuid/handler_inputs_preserved.cpp
+)
+
+add_vmm_executable(
+    integration_cpuid_handler_multiple
+    SOURCES cpuid/handler_multiple.cpp
+)
+
+add_vmm_executable(
+    integration_cpuid_handler_vcpu_matches_hardware
+    SOURCES cpuid/handler_vcpu_matches_hardware.cpp
 )

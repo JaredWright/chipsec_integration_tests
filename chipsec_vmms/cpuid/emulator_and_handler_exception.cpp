@@ -28,24 +28,31 @@ using namespace bfvmm::intel_x64;
 // Register one emulator and one handler for the same CPUID leaf. The following
 // behaviors should be observed:
 //  - The emulator should be called first
-//  - The emulator returns false, indicated that emulation is not complete
+//  - The emulator returns false, indicating that emulation is not complete
 //  - An unhandled vmexit exception should occur
 //  - The handler should never be called
 //
 
-bool emulator(vcpu_t *vcpu)
-{ return false; }
+bool emulator(vcpu *vcpu)
+{ bfignored(vcpu); return false; }
 
-bool handler(vcpu_t *vcpu)
+bool handler(vcpu *vcpu)
 {
     vcpu->set_rax(0xDEAD);
     return false;
 }
 
-bool vcpu_init(vcpu_t *vcpu)
+void hlt_delegate(bfobject *obj)
 {
-    cpuid::add_emulator(vcpu, 0xF00D, cpuid::handler(emulator));
-    cpuid::add_handler(vcpu, 0xF00D, cpuid::handler(handler));
+    bfignored(obj);
+    bfdebug_pass(0, "Halt delegate ran");
+}
+
+bool vcpu_init_nonroot(vcpu *vcpu)
+{
+    cpuid::add_emulator(vcpu, 0xF00D, handler_delegate(emulator));
+    cpuid::add_handler(vcpu, 0xF00D, handler_delegate(handler));
+    vcpu->add_hlt_delegate(hlt_delegate_t::create<hlt_delegate>());
 
     return true;
 }
