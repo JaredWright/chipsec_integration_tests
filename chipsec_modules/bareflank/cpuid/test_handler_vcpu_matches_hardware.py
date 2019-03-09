@@ -1,6 +1,18 @@
 """
-A chipsec module to test if Bareflank CPUID handlers receive a vcpu that is
-already populated with hardware "output" values
+Test Scenario:
+
+Make sure that the vcpu passed into a cpuid handler already contains the
+values reported by hardware for the cpuid instruction that caused the vmexit.
+A VMM is loaded that registers a single cpuid handler for an existing cpuid
+leaf, and behaves as follows:
+  - Save the vcpu state associated with cpuid instruction "outputs"
+    (i.e. eax, ebx, ecx, edx).
+  - Re-run CPUID manually and re-populate the vcpu with hardware state.
+    This should result in the vcpu's registers retaining the same values
+  - Return true to end the handler chain
+
+The "original" vcpu state (at the handler's entry point) is exposed through a
+sperate cpuid emulator for comparison
 """
 
 from bareflank.base_module import *
@@ -14,7 +26,6 @@ class test_handler_vcpu_matches_hardware(BareflankBaseModule):
         BareflankBaseModule.__init__(self)
 
     def run(self, module_argv):
-        self.logger.start_test(_MODULE_NAME)
         test_passed = True
 
         # Real CPUID leaf (no vmm loaded yet)

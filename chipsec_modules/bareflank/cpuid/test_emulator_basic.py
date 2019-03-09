@@ -1,5 +1,10 @@
 """
-A chipsec module to test Bareflank CPUID emulation
+Test Scenario:
+
+A VMM registers one emulator for a non-existent CPUID leaf. The emulator should
+behave as follows:
+  - Returns a constant value in eax
+  - Copies the subleaf (ecx) that caused the vmexit into [ebx, ecx, edx].
 """
 
 from bareflank.base_module import *
@@ -16,8 +21,6 @@ class test_emulator_basic(BareflankBaseModule):
         self._module_failed = False
 
     def run(self, module_argv):
-        self.logger.start_test(_MODULE_NAME)
-
         self.load_vmm(module_argv, "integration_cpuid_emulator_basic_static")
 
         self._test_zeros_preserved()

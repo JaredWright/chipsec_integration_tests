@@ -1,6 +1,17 @@
 """
-A chipsec module to test that Bareflank CPUID emulators do not accidentally leak
-hardware values transparently
+Test Scenario:
+
+Make sure that the vcpu passed into a cpuid emulator does NOT contain the
+values reported by hardware for the cpuid instruction that caused the vmexit.
+This tests that a cpuid emulator does not transparently leak values from
+hardware without explicitly trying to do so.
+
+To test this property, a VMM is loaded that:
+  - Registers one emulator for a real CPUID leaf (0 = Basic CPUID Information)
+  - The emulator does nothing, and returns true to end the handler chain.
+
+The observer of the emulated CPUID leaf should not see any values returned
+through eax, ebx, ecx, or edx.
 """
 
 from bareflank.base_module import *
@@ -14,8 +25,6 @@ class test_emulator_does_not_leak_hardware(BareflankBaseModule):
         BareflankBaseModule.__init__(self)
 
     def run(self, module_argv):
-        self.logger.start_test(_MODULE_NAME)
-
         test_passed = True
 
         # CPUID leaf when no vmm is loaded. Conviniently, CPUID leaf 0 always

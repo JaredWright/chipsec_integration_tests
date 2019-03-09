@@ -23,14 +23,6 @@
 
 using namespace bfvmm::intel_x64;
 
-// Scenario:
-//
-// Emulate a CPUID leaf using multiple emulators. Each emulator should be able
-// to see the leaf and subleaf that caused the vmexit to happen, regardless of
-// the values currently in vcpu->rax and vcpu->rcx. The leaf/subleaf read from
-// each handler are exposed at a seperate emulated CPUID leaf for comparison
-//
-
 // Values for leaf/subleaf according to the expected vcpu general register
 // locations (leaf = vcpu->gr1, subleaf = vcpu->gr2)
 uint64_t leaf_internal_location = 0xBADC0FFE;

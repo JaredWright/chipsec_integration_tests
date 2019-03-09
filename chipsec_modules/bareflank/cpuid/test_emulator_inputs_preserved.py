@@ -1,7 +1,11 @@
 """
-A chipsec module to test if Bareflank CPUID emulators can access the leaf and
-subleaf that caused a vmexit to happen, regardless of the vcpu's current values
-for rax and rcx
+Test Scenario:
+
+A VMM is loaded that emulates a CPUID leaf using multiple emulators.
+Each emulator should be able to see the leaf and subleaf that caused the vmexit
+to happen, regardless of the values currently in vcpu->rax and vcpu->rcx.
+The leaf/subleaf that are read from each handler are exposed at seperate
+emulated CPUID leaves for comparison
 """
 
 from bareflank.base_module import *
@@ -15,7 +19,6 @@ class test_emulator_inputs_preserved(BareflankBaseModule):
         BareflankBaseModule.__init__(self)
 
     def run(self, module_argv):
-        self.logger.start_test(_MODULE_NAME)
         test_passed = True
 
         self.load_vmm(module_argv, "integration_cpuid_emulator_inputs_preserved_static")

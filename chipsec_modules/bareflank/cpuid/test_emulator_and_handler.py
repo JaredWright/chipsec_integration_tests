@@ -1,11 +1,18 @@
 """
-A chipsec module to test Bareflank CPUID emulation
+Test Scenario:
+
+A VMM registers one emulator and one handler for the same CPUID leaf.
+The following behaviors should be observed:
+  - The emulator should be called first
+  - The emulator returns true, indicated that emulation is complete
+  - The handler should never be called
 """
 
 from bareflank.base_module import *
 from chipsec.hal.cpuid import *
 
 _MODULE_NAME = 'CPUID Emulator And Handler Test'
+_VMM_NAME = 'CPUID Emulator And Handler Test'
 TAGS = ["BAREFLANK"]
 
 class test_emulator_and_handler(BareflankBaseModule):
@@ -13,8 +20,6 @@ class test_emulator_and_handler(BareflankBaseModule):
         BareflankBaseModule.__init__(self)
 
     def run(self, module_argv):
-        self.logger.start_test(_MODULE_NAME)
-
         self.load_vmm(module_argv, "integration_cpuid_emulator_and_handler_static")
 
         cpuid_result = self.cpuid(0xF00D, 0x0)

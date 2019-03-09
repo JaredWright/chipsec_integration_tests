@@ -1,7 +1,10 @@
 """
-A chipsec module to test if Bareflank CPUID handlers can access the leaf and
-subleaf that caused a vmexit to happen, regardless of the vcpu's current values
-for rax and rcx
+Test Scenario:
+
+A VMM handles a CPUID leaf using multiple handlers. Each handler should be able
+to see the leaf and subleaf that caused the vmexit to happen, regardless of
+the values currently in vcpu->rax and vcpu->rcx. The leaf/subleaf read from
+each handler are exposed at a seperate emulated CPUID leaf for comparison
 """
 
 from bareflank.base_module import *
@@ -15,7 +18,6 @@ class test_handler_inputs_preserved(BareflankBaseModule):
         BareflankBaseModule.__init__(self)
 
     def run(self, module_argv):
-        self.logger.start_test(_MODULE_NAME)
         test_passed = True
 
         self.load_vmm(module_argv, "integration_cpuid_handler_inputs_preserved_static")

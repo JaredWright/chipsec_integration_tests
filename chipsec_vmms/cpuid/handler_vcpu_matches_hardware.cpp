@@ -23,23 +23,6 @@
 
 using namespace bfvmm::intel_x64;
 
-// Scenario:
-//
-// Make sure that the vcpu passed into a cpuid handler already contains the
-// values reported by hardware for the cpuid instruction that caused the vmexit.
-// A single cpuid handler is registered for an existing cpuid leaf, and behaves
-// as follows:
-//
-//  - Save the vcpu state associated with cpuid instruction "outputs"
-//      (i.e. eax, ebx, ecx, edx).
-//  - Re-run CPUID manually and re-populate the vcpu with hardware state.
-//      This should result in the vcpu's registers retaining the same values 
-//  - Return true to end the handler chain
-// 
-// The "original" vcpu state (at the handler's entry point) is exposed through a
-// sperate cpuid emulator for comparison
-//
-
 uint64_t g_rax = 0;
 uint64_t g_rbx = 0;
 uint64_t g_rcx = 0;

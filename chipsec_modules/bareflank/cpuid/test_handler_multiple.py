@@ -1,6 +1,10 @@
 """
-A chipsec module to test Bareflank CPUID emulation that is handled through
-multiple handlers for the same CPUID leaf
+Test Scenario:
+
+A VMM emulates a CPUID leaf using multiple handlers. Each handler is
+responsible for setting a single output register for the cpuid instruction
+(i.e. one handler sets eax, another sets ebx, etc). The fourth handler returns
+false, yielding to the base cpuid handler to complete any built-in behaviors.
 """
 
 from bareflank.base_module import *
@@ -14,8 +18,6 @@ class test_handler_multiple(BareflankBaseModule):
         BareflankBaseModule.__init__(self)
 
     def run(self, module_argv):
-        self.logger.start_test(_MODULE_NAME)
-
         self.load_vmm(module_argv, "integration_cpuid_handler_multiple_static")
 
         cpuid_result = self.cpuid(0xF00D, 0x0)

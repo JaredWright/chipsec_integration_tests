@@ -1,5 +1,14 @@
 """
-A chipsec module to test a basic Bareflank CPUID handler
+Test Scenario:
+
+A VMM registers one handler for an existing CPUID leaf. The handler behaves as
+follows:
+  - Increments a counter every time the handler runs
+  - Does not modify the vcpu in any way
+  - Returns false, yielding to the base cpuid handler
+
+The counter is exposed through a seperate cpuid emulator at a non-existent
+cpuid leaf
 """
 
 from bareflank.base_module import *
@@ -13,8 +22,6 @@ class test_handler_basic(BareflankBaseModule):
         BareflankBaseModule.__init__(self)
 
     def run(self, module_argv):
-        self.logger.start_test(_MODULE_NAME)
-
         test_passed = True
 
         # CPUID leaf when no vmm is loaded. Conviniently, CPUID leaf 0 always

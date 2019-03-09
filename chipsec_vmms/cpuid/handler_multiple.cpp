@@ -23,14 +23,6 @@
 
 using namespace bfvmm::intel_x64;
 
-// Scenario:
-//
-// Emulate a CPUID leaf using multiple handlers. Each handler is responsible for
-// setting a single output register for the cpuid instruction (i.e. one handler
-// sets eax, another sets ebx, etc). The fourth handler returns false, yielding
-// to the base cpuid handler to complete any built-in behaviors.
-//
-
 bool handler_1(vcpu *vcpu)
 {
     vcpu->set_rax(0xBEEF);

@@ -23,15 +23,6 @@
 
 using namespace bfvmm::intel_x64;
 
-// Scenario:
-//
-// Emulate a CPUID leaf using multiple emulators. Each emulator is responsible
-// for setting a single output register for the cpuid instruction (i.e. one
-// emulator sets eax, another sets ebx, etc). The fourth emulator returns true,
-// indicating that emulation is complete. A fifth emulator is added that should
-// not be called.
-//
-
 bool emulator_1(vcpu *vcpu)
 {
     vcpu->set_rax(0xBEEF);

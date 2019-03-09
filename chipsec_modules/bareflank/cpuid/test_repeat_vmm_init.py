@@ -1,7 +1,11 @@
 """
-A chipsec module to test what happens when you run the special Bareflank "init"
-CPUID leaf repeatedly. Running this CPUID leaf shouldn't cause the sysetem
-any instability, and shouldn't re-initizlize the VMM (security concern)
+Test Scenario:
+
+Run the special Bareflank "init" CPUID leaf repeatedly. Running this CPUID leaf
+should not cause the system any instability
+
+TODO: Test that this leaf does not re-initizlize the vCPU managing the core
+that this test runs on
 """
 
 from bareflank.base_module import *
@@ -16,10 +20,10 @@ class test_repeat_vmm_init(BareflankBaseModule):
         BareflankBaseModule.__init__(self)
 
     def run(self, module_argv):
-        self.logger.start_test(_MODULE_NAME)
-        self.logger.rootLogger.setLevel(pyLogging.ERROR)
-
         self.load_vmm(module_argv, "bfvmm_static")
+
+        # This test has very noisy output, silence to a reasonable level
+        self.logger.rootLogger.setLevel(pyLogging.ERROR)
 
         for i in range(100):
             result = self.cpuid(0x4BF00010, 0x0)
@@ -31,6 +35,6 @@ class test_repeat_vmm_init(BareflankBaseModule):
 
         self.logger.rootLogger.setLevel(self.logger.debug)
         self.logger.log_passed(_MODULE_NAME)
-        return ModuleResult.PASSED
-
         self.unload_vmm(module_argv)
+
+        return ModuleResult.PASSED

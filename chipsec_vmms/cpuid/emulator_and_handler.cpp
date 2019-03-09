@@ -23,15 +23,6 @@
 
 using namespace bfvmm::intel_x64;
 
-// Scenario:
-//
-// Register one emulator and one handler for the same CPUID leaf. The following
-// behaviors should be observed:
-//  - The emulator should be called first
-//  - The emulator returns true, indicated that emulation is complete
-//  - The handler should never be called
-//
-
 bool emulator(vcpu *vcpu)
 {
     vcpu->set_rax(0xBEEF);

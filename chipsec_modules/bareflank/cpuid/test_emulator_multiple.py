@@ -1,6 +1,11 @@
 """
-A chipsec module to test Bareflank CPUID emulation that is handled through
-multiple emulators for the same CPUID leaf
+Test Scenario:
+
+A VMM emulates a CPUID leaf using multiple emulators. Each emulator is
+responsible for setting a single output register for the cpuid instruction
+(i.e. one emulator sets eax, another sets ebx, etc). The fourth emulator
+returns true, indicating that emulation is complete. A fifth emulator is added
+that should not be called.
 """
 
 from bareflank.base_module import *
@@ -14,8 +19,6 @@ class test_emulator_multiple(BareflankBaseModule):
         BareflankBaseModule.__init__(self)
 
     def run(self, module_argv):
-        self.logger.start_test(_MODULE_NAME)
-
         self.load_vmm(module_argv, "integration_cpuid_emulator_multiple_static")
 
         cpuid_result = self.cpuid(0xF00D, 0x0)

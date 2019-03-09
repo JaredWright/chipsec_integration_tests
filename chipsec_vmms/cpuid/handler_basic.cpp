@@ -23,18 +23,6 @@
 
 using namespace bfvmm::intel_x64;
 
-// Scenario:
-//
-// Register one handler for an existing CPUID leaf. The handler behaves as
-// follows:
-//  - Increments a counter every time the handler runs
-//  - Does not modify the vcpu in any way
-//  - Returns false, yielding to the base cpuid handler
-// 
-// The counter is exposed through a seperate cpuid emulator at a non-existent
-// cpuid leaf
-//
-
 uint64_t g_counter = 0;
 
 bool handler(vcpu *vcpu)

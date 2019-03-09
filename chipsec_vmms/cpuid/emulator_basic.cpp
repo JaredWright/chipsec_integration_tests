@@ -23,14 +23,6 @@
 
 using namespace bfvmm::intel_x64;
 
-// Scenario:
-//
-// Register one emulator for a non-existent CPUID leaf. The emulator behaves as
-// follows:
-//  - Returns a constant value in eax
-//  - Copies the subleaf (ecx) that caused the vmexit into [ebx, ecx, edx].
-//
-
 bool emulator(vcpu *vcpu)
 {
     auto subleaf = cpuid::get_subleaf(vcpu);

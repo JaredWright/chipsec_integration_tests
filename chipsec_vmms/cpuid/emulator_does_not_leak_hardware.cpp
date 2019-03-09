@@ -23,20 +23,6 @@
 
 using namespace bfvmm::intel_x64;
 
-// Scenario:
-//
-// Make sure that the vcpu passed into a cpuid emulator does NOT contain the
-// values reported by hardware for the cpuid instruction that caused the vmexit.
-// This tests that a cpuid emulator does not transparently leak values from
-// hardware without explicitly trying to do so. To test this property:
-//
-//  - Register one emulator for a real CPUID leaf (0 = Basic CPUID Information)
-//  - The emulator does nothing, and returns true to end the handler chain.
-//
-//  The observer of the emulated CPUID leaf should not see any values returned
-//  through eax, ebx, ecx, or edx.
-//
-
 bool emulator_1(vcpu *vcpu)
 {
     vcpu->advance();

@@ -6,6 +6,7 @@ Provides helpers for loading/unloading VMMs, and performing common operations
 
 import subprocess
 import os
+import inspect
 
 from chipsec.module_common import *
 
@@ -14,6 +15,9 @@ _MODULE_NAME = 'Bareflank Base'
 class BareflankBaseModule(BaseModule):
     def __init__(self):
         BaseModule.__init__(self)
+        class_module = inspect.getmodule(self)
+        self.logger.start_test(str(class_module._MODULE_NAME))
+        self.logger.log_heading(str(class_module.__doc__))
 
     def is_supported(self):
         return True
@@ -34,10 +38,13 @@ class BareflankBaseModule(BaseModule):
         if subprocess.call([bfm_path, "start"]):
             raise Exception("Failed to load vmm: " + str(vmm_path))
 
+        self.logger.log_good("VMM Loaded:  " + str(vmm_name))
+
     def unload_vmm(self, module_argv):
         bfm_path = str(module_argv[0])
         ret = subprocess.call([bfm_path, "stop"])
         ret = subprocess.call([bfm_path, "unload"])
+        self.logger.log_good("VMM Unloaded")
 
     # -------------------------------------------------------------------------
     # CPUID helpers
