@@ -16,9 +16,7 @@ class test_ack(BareflankBaseModule):
         BareflankBaseModule.__init__(self)
 
     def run(self, module_argv):
-        #  self.logger.start_test(_MODULE_NAME)
-
-        self.load_vmm(module_argv, "bfvmm_static")
+        self.load_vmm(module_argv, "vmm")
 
         cpuid_result = self.cpuid(0x4BF00000, 0x0)
         expected = (0x4BF00001, 0, 0, 0)

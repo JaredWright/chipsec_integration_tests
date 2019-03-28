@@ -19,18 +19,53 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-include(${CMAKE_CURRENT_LIST_DIR}/targets.cmake)
-
-include_dependency(CMAKE_CURRENT_LIST_DIR chipsec)
-
-userspace_extension(
-    chipsec_modules
-    DEPENDS chipsec
-    SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/chipsec_modules
+chipsec_test_vmm(
+    integration_cpuid_emulator_and_handler
+    SOURCES emulator_and_handler.cpp
 )
 
-vmm_extension(
-    chipsec_vmms
-    DEPENDS bfvmm
-    SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/chipsec_vmms
+chipsec_test_vmm(
+    integration_cpuid_emulator_and_handler_exception
+    SOURCES emulator_and_handler_exception.cpp
+)
+
+
+chipsec_test_vmm(
+    integration_cpuid_emulator_basic
+    SOURCES emulator_basic.cpp
+)
+
+chipsec_test_vmm(
+    integration_cpuid_emulator_does_not_leak_hardware
+    SOURCES emulator_does_not_leak_hardware.cpp
+)
+
+chipsec_test_vmm(
+    integration_cpuid_emulator_inputs_preserved
+    SOURCES emulator_inputs_preserved.cpp
+)
+
+chipsec_test_vmm(
+    integration_cpuid_emulator_multiple
+    SOURCES emulator_multiple.cpp
+)
+
+chipsec_test_vmm(
+    integration_cpuid_handler_basic
+    SOURCES handler_basic.cpp
+)
+
+chipsec_test_vmm(
+    integration_cpuid_handler_inputs_preserved
+    SOURCES handler_inputs_preserved.cpp
+)
+
+chipsec_test_vmm(
+    integration_cpuid_handler_multiple
+    SOURCES handler_multiple.cpp
+)
+
+chipsec_test_vmm(
+    integration_cpuid_handler_vcpu_matches_hardware
+    SOURCES handler_vcpu_matches_hardware.cpp
 )

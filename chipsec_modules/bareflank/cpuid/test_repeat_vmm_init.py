@@ -20,7 +20,7 @@ class test_repeat_vmm_init(BareflankBaseModule):
         BareflankBaseModule.__init__(self)
 
     def run(self, module_argv):
-        self.load_vmm(module_argv, "bfvmm_static")
+        self.load_vmm(module_argv, "vmm")
 
         # This test has very noisy output, silence to a reasonable level
         self.logger.rootLogger.setLevel(pyLogging.ERROR)

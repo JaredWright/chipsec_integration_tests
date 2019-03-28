@@ -21,7 +21,7 @@ class test_emulator_inputs_preserved(BareflankBaseModule):
     def run(self, module_argv):
         test_passed = True
 
-        self.load_vmm(module_argv, "integration_cpuid_emulator_inputs_preserved_static")
+        self.load_vmm(module_argv, "integration_cpuid_emulator_inputs_preserved")
 
         # Trigger the test to happen
         self.cpuid(0xF00D, 0xBEEF)

@@ -20,7 +20,7 @@ class test_emulator_and_handler(BareflankBaseModule):
         BareflankBaseModule.__init__(self)
 
     def run(self, module_argv):
-        self.load_vmm(module_argv, "integration_cpuid_emulator_and_handler_static")
+        self.load_vmm(module_argv, "integration_cpuid_emulator_and_handler")
 
         cpuid_result = self.cpuid(0xF00D, 0x0)
         expected = (0xBEEF, 0, 0, 0)

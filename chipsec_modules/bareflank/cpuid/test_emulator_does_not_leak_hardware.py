@@ -32,7 +32,7 @@ class test_emulator_does_not_leak_hardware(BareflankBaseModule):
         real_cpuid_result = self.cpuid(0, 0)
         self.cpuid_print(real_cpuid_result)
 
-        self.load_vmm(module_argv, "integration_cpuid_emulator_does_not_leak_hardware_static")
+        self.load_vmm(module_argv, "integration_cpuid_emulator_does_not_leak_hardware")
 
         # Read the same CPUID leaf when vmm is loaded and emulating
         emulated_cpuid_result = self.cpuid(0, 0)

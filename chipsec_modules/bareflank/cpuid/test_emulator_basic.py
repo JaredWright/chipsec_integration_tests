@@ -21,7 +21,7 @@ class test_emulator_basic(BareflankBaseModule):
         self._module_failed = False
 
     def run(self, module_argv):
-        self.load_vmm(module_argv, "integration_cpuid_emulator_basic_static")
+        self.load_vmm(module_argv, "integration_cpuid_emulator_basic")
 
         self._test_zeros_preserved()
         self._test_ones_preserved()

@@ -19,58 +19,20 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-cmake_minimum_required(VERSION 3.6)
+cmake_minimum_required(VERSION 3.13)
 project(chipsec_vmms C CXX)
 
-include(${SOURCE_CMAKE_DIR}/project.cmake)
-init_project()
+init_project(chipsec_vmms INTERFACE)
 
-add_vmm_executable(
-    integration_cpuid_emulator_and_handler
-    SOURCES cpuid/emulator_and_handler.cpp
-)
+macro(chipsec_test_vmm NAME)
+    set(multiVal SOURCES)
+    cmake_parse_arguments(ARG "" "" "${multiVal}" ${ARGN})
+    add_executable(${NAME} ${ARG_SOURCES})
+    target_link_libraries(${NAME} PUBLIC vmm::bfvmm)
+    target_link_libraries(${NAME} PUBLIC vmm::bfvmm_sdk)
+    install(TARGETS ${NAME} DESTINATION bin EXPORT chipsec_vmms-vmm-targets)
+endmacro()
 
-add_vmm_executable(
-    integration_cpuid_emulator_and_handler_exception
-    SOURCES cpuid/emulator_and_handler_exception.cpp
-)
+add_subdirectory(cpuid)
 
-add_vmm_executable(
-    integration_cpuid_emulator_basic
-    SOURCES cpuid/emulator_basic.cpp
-)
-
-add_vmm_executable(
-    integration_cpuid_emulator_does_not_leak_hardware
-    SOURCES cpuid/emulator_does_not_leak_hardware.cpp
-)
-
-add_vmm_executable(
-    integration_cpuid_emulator_inputs_preserved
-    SOURCES cpuid/emulator_inputs_preserved.cpp
-)
-
-add_vmm_executable(
-    integration_cpuid_emulator_multiple
-    SOURCES cpuid/emulator_multiple.cpp
-)
-
-add_vmm_executable(
-    integration_cpuid_handler_basic
-    SOURCES cpuid/handler_basic.cpp
-)
-
-add_vmm_executable(
-    integration_cpuid_handler_inputs_preserved
-    SOURCES cpuid/handler_inputs_preserved.cpp
-)
-
-add_vmm_executable(
-    integration_cpuid_handler_multiple
-    SOURCES cpuid/handler_multiple.cpp
-)
-
-add_vmm_executable(
-    integration_cpuid_handler_vcpu_matches_hardware
-    SOURCES cpuid/handler_vcpu_matches_hardware.cpp
-)
+fini_project()

@@ -28,7 +28,7 @@ class test_handler_basic(BareflankBaseModule):
         # has outputs for eax, ebx, ecx, and edx
         real_cpuid_result = self.cpuid(0, 0)
 
-        self.load_vmm(module_argv, "integration_cpuid_handler_basic_static")
+        self.load_vmm(module_argv, "integration_cpuid_handler_basic")
 
         # Read the same CPUID leaf when vmm is loaded and emulating
         handled_cpuid_result = self.cpuid(0, 0)

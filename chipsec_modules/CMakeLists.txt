@@ -19,11 +19,10 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-cmake_minimum_required(VERSION 3.6)
+cmake_minimum_required(VERSION 3.13)
 project(chipsec_modules C CXX)
 
-include(${SOURCE_CMAKE_DIR}/project.cmake)
-init_project()
+init_project(chipsec_modules INTERFACE)
 
 file(GLOB_RECURSE CHIPSEC_MODULES_SRC_FILES "*/*.py")
 
@@ -38,6 +37,8 @@ add_custom_command(
     COMMENT "Updating chipsec modules"
 )
 
-add_custom_target(chipsec_modules ALL DEPENDS ${CHIPSEC_MODULES_STAMP})
+# add_custom_target(chipsec_modules ALL DEPENDS ${CHIPSEC_MODULES_STAMP})
 
 install(DIRECTORY bareflank DESTINATION bin/chipsec_modules)
+
+fini_project()

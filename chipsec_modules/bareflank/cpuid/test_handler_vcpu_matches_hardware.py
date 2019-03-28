@@ -31,7 +31,7 @@ class test_handler_vcpu_matches_hardware(BareflankBaseModule):
         # Real CPUID leaf (no vmm loaded yet)
         real_cpuid_result = self.cpuid(0x0, 0x0)
 
-        self.load_vmm(module_argv, "integration_cpuid_handler_vcpu_matches_hardware_static")
+        self.load_vmm(module_argv, "integration_cpuid_handler_vcpu_matches_hardware")
 
         # Same CPUID leaf with a vmm loaded
         handled_cpuid_result = self.cpuid(0x0, 0x0)
