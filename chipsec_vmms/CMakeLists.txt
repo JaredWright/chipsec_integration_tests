@@ -29,7 +29,6 @@ macro(chipsec_test_vmm NAME)
     cmake_parse_arguments(ARG "" "" "${multiVal}" ${ARGN})
     add_executable(${NAME} ${ARG_SOURCES})
     target_link_libraries(${NAME} PUBLIC vmm::bfvmm)
-    target_link_libraries(${NAME} PUBLIC vmm::bfvmm_sdk)
     install(TARGETS ${NAME} DESTINATION bin EXPORT chipsec_vmms-vmm-targets)
 endmacro()
 
