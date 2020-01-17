@@ -23,44 +23,29 @@
 
 using namespace bfvmm::intel_x64;
 
-bool emulator_1(vcpu *vcpu)
+// TODO: Chipsec module for this VMM. Test that neither the handler, not the
+// emulator get called even though they are registered, because trapping for the
+// MSR they are registered to is never turned on
+bool emulator(vcpu *vcpu)
 {
-    vcpu->set_rax(0xBEEF);
-    return false;
-}
-
-bool emulator_2(vcpu *vcpu)
-{
-    vcpu->set_rbx(0xA55A);
-    return false;
-}
-
-bool emulator_3(vcpu *vcpu)
-{
-    vcpu->set_rcx(0x5AA5AA55);
-    return false;
-}
-
-bool emulator_4(vcpu *vcpu)
-{
-    vcpu->set_rdx(0xFFFFFFFF);
+    vcpu->set_rax(0xDEADBEEF);
+    vcpu->set_rdx(0xDEADBEEF);
     vcpu->advance();
     return true;
 }
 
-bool emulator_5(vcpu *vcpu)
+bool handler(vcpu *vcpu)
 {
-    vcpu->set_rax(0xDEAD);
-    return false;
+    vcpu->set_rax(0xDEADBEEF);
+    vcpu->set_rdx(0xDEADBEEF);
+    vcpu->advance();
+    return true;
 }
 
 bool vcpu_init_nonroot(vcpu *vcpu)
 {
-    vcpu->cpuid_add_emulator(0xF00D, emulator_5);
-    vcpu->cpuid_add_emulator(0xF00D, emulator_4);
-    vcpu->cpuid_add_emulator(0xF00D, emulator_3);
-    vcpu->cpuid_add_emulator(0xF00D, emulator_2);
-    vcpu->cpuid_add_emulator(0xF00D, emulator_1);
+    vcpu->rdmsr_add_emulator(0x000000000000003B, handler_delegate_t::create<emulator>());
+    vcpu->rdmsr_add_handler(0x000000000000003B, handler_delegate_t::create<handler>());
 
     return true;
 }

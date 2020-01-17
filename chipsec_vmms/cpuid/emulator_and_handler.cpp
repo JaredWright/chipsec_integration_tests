@@ -38,8 +38,8 @@ bool handler(vcpu *vcpu)
 
 bool vcpu_init_nonroot(vcpu *vcpu)
 {
-    cpuid::add_emulator(vcpu, 0xF00D, handler_delegate(emulator));
-    cpuid::add_handler(vcpu, 0xF00D, handler_delegate(handler));
+    vcpu->cpuid_add_emulator(0xF00D, emulator);
+    vcpu->cpuid_add_handler(0xF00D, handler);
 
     return true;
 }

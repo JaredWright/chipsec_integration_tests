@@ -23,44 +23,16 @@
 
 using namespace bfvmm::intel_x64;
 
-bool emulator_1(vcpu *vcpu)
+bool handler(vcpu *vcpu)
 {
-    vcpu->set_rax(0xBEEF);
-    return false;
-}
-
-bool emulator_2(vcpu *vcpu)
-{
-    vcpu->set_rbx(0xA55A);
-    return false;
-}
-
-bool emulator_3(vcpu *vcpu)
-{
-    vcpu->set_rcx(0x5AA5AA55);
-    return false;
-}
-
-bool emulator_4(vcpu *vcpu)
-{
-    vcpu->set_rdx(0xFFFFFFFF);
+    // No in-handler APIs needed
     vcpu->advance();
     return true;
 }
 
-bool emulator_5(vcpu *vcpu)
-{
-    vcpu->set_rax(0xDEAD);
-    return false;
-}
-
 bool vcpu_init_nonroot(vcpu *vcpu)
 {
-    vcpu->cpuid_add_emulator(0xF00D, emulator_5);
-    vcpu->cpuid_add_emulator(0xF00D, emulator_4);
-    vcpu->cpuid_add_emulator(0xF00D, emulator_3);
-    vcpu->cpuid_add_emulator(0xF00D, emulator_2);
-    vcpu->cpuid_add_emulator(0xF00D, emulator_1);
+    vcpu->init_signal_add_handler(handler_delegate_t::create<handler>());
 
     return true;
 }

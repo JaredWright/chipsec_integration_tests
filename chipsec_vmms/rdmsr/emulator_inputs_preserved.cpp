@@ -23,30 +23,22 @@
 
 using namespace bfvmm::intel_x64;
 
-// Values for leaf/subleaf according to the expected vcpu general register
-// locations (leaf = vcpu->gr1, subleaf = vcpu->gr2)
-uint64_t leaf_internal_location = 0xBADC0FFE;
-uint64_t subleaf_internal_location = 0xBADC0FFE;
+// Value for MSR address according to the expected vcpu general register
+// locations (address = vcpu->gr1)
+uint64_t msr_address_internal_location = 0xBADC0FFE;
 
-// Values for leaf/subleaf as viewed by emulator_1, calculated by the cpuid api
-uint64_t leaf_at_emulator_1 = 0xBADC0FFE;
-uint64_t subleaf_at_emulator_1 = 0xBADC0FFE;
+// Values for MSR address as viewed by emulator_1, calculated by the rdmsr api
+uint64_t msr_address_at_emulator_1 = 0xBADC0FFE;
 
-// Values for leaf/subleaf as viewed by emulator_2, calculated by the cpuid api
-uint64_t leaf_at_emulator_2 = 0xBADC0FFE;
-uint64_t subleaf_at_emulator_2 = 0xBADC0FFE;
+// Values for MSR address as viewed by emulator_2, calculated by the rdmsr api
+uint64_t msr_address_at_emulator_2 = 0xBADC0FFE;
 
 bool emulator_1(vcpu *vcpu)
 {
-    leaf_internal_location = vcpu->gr1();
-    subleaf_internal_location = vcpu->gr2();
-
-    leaf_at_emulator_1 = vcpu->cpuid_vmexit_leaf();
-    subleaf_at_emulator_1 = vcpu->cpuid_vmexit_subleaf();
+    msr_address_internal_location = vcpu->gr1();
+    msr_address_at_emulator_1 = vcpu->rdmsr_vmexit_address();
 
     vcpu->set_rax(0xFFFFFFFF);
-    vcpu->set_rbx(0xFFFFFFFF);
-    vcpu->set_rcx(0xFFFFFFFF);
     vcpu->set_rdx(0xFFFFFFFF);
 
     return false;
@@ -54,8 +46,7 @@ bool emulator_1(vcpu *vcpu)
 
 bool emulator_2(vcpu *vcpu)
 {
-    leaf_at_emulator_2 = vcpu->cpuid_vmexit_leaf();
-    subleaf_at_emulator_2 = vcpu->cpuid_vmexit_subleaf();
+    msr_address_at_emulator_2 = vcpu->rdmsr_vmexit_address();
 
     vcpu->advance();
     return true;
@@ -63,10 +54,7 @@ bool emulator_2(vcpu *vcpu)
 
 bool emulator_3(vcpu *vcpu)
 {
-    vcpu->set_rax(leaf_internal_location);
-    vcpu->set_rbx(0x0);
-    vcpu->set_rcx(subleaf_internal_location);
-    vcpu->set_rdx(0x0);
+    vcpu->rdmsr_emulate(msr_address_internal_location);
 
     vcpu->advance();
     return true;
@@ -74,10 +62,7 @@ bool emulator_3(vcpu *vcpu)
 
 bool emulator_4(vcpu *vcpu)
 {
-    vcpu->set_rax(leaf_at_emulator_1);
-    vcpu->set_rbx(0x0);
-    vcpu->set_rcx(subleaf_at_emulator_1);
-    vcpu->set_rdx(0x0);
+    vcpu->rdmsr_emulate(msr_address_at_emulator_1);
 
     vcpu->advance();
     return true;
@@ -85,10 +70,7 @@ bool emulator_4(vcpu *vcpu)
 
 bool emulator_5(vcpu *vcpu)
 {
-    vcpu->set_rax(leaf_at_emulator_2);
-    vcpu->set_rbx(0x0);
-    vcpu->set_rcx(subleaf_at_emulator_2);
-    vcpu->set_rdx(0x0);
+    vcpu->rdmsr_emulate(msr_address_at_emulator_2);
 
     vcpu->advance();
     return true;
@@ -96,12 +78,18 @@ bool emulator_5(vcpu *vcpu)
 
 bool vcpu_init_nonroot(vcpu *vcpu)
 {
-    vcpu->cpuid_add_emulator(0xF00D, emulator_2);
-    vcpu->cpuid_add_emulator(0xF00D, emulator_1);
+    vcpu->rdmsr_add_emulator(0x000000000000F00D, handler_delegate_t::create<emulator_2>());
+    vcpu->rdmsr_add_emulator(0x000000000000F00D, handler_delegate_t::create<emulator_1>());
+    vcpu->rdmsr_trap(0x000000000000F00D);
 
-    vcpu->cpuid_add_emulator(0xBEEF1, emulator_3);
-    vcpu->cpuid_add_emulator(0xBEEF2, emulator_4);
-    vcpu->cpuid_add_emulator(0xBEEF3, emulator_5);
+    vcpu->rdmsr_add_emulator(0x00000000000BEEF1, handler_delegate_t::create<emulator_3>());
+    vcpu->rdmsr_trap(0x00000000000BEEF1);
+
+    vcpu->rdmsr_add_emulator(0x00000000000BEEF2, handler_delegate_t::create<emulator_4>());
+    vcpu->rdmsr_trap(0x00000000000BEEF2);
+
+    vcpu->rdmsr_add_emulator(0x00000000000BEEF3, handler_delegate_t::create<emulator_5>());
+    vcpu->rdmsr_trap(0x00000000000BEEF3);
 
     return true;
 }

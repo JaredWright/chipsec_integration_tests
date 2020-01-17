@@ -20,66 +20,61 @@
 # SOFTWARE.
 
 chipsec_test_vmm(
-    integration_cpuid_emulate
+    integration_rdmsr_emulate
     SOURCES emulate.cpp
 )
 
 chipsec_test_vmm(
-    integration_cpuid_emulator_and_handler
+    integration_rdmsr_emulator_and_handler
     SOURCES emulator_and_handler.cpp
 )
 
-# chipsec_test_vmm(
-#     integration_cpuid_emulator_and_handler_exception
-#     SOURCES emulator_and_handler_exception.cpp
-# )
-
 chipsec_test_vmm(
-    integration_cpuid_emulator_basic
+    integration_rdmsr_emulator_basic
     SOURCES emulator_basic.cpp
 )
 
 chipsec_test_vmm(
-    integration_cpuid_emulator_does_not_leak_hardware
+    integration_rdmsr_emulator_does_not_leak_hardware
     SOURCES emulator_does_not_leak_hardware.cpp
 )
 
 chipsec_test_vmm(
-    integration_cpuid_emulator_inputs_preserved
+    integration_rdmsr_emulator_inputs_preserved
     SOURCES emulator_inputs_preserved.cpp
 )
 
 chipsec_test_vmm(
-    integration_cpuid_emulator_multiple
+    integration_rdmsr_emulator_multiple
     SOURCES emulator_multiple.cpp
 )
 
 chipsec_test_vmm(
-    integration_cpuid_execute
+    integration_rdmsr_execute
     SOURCES execute.cpp
 )
 
 chipsec_test_vmm(
-    integration_cpuid_handler_basic
+    integration_rdmsr_handler_basic
     SOURCES handler_basic.cpp
 )
 
 chipsec_test_vmm(
-    integration_cpuid_handler_inputs_preserved
+    integration_rdmsr_handler_inputs_preserved
     SOURCES handler_inputs_preserved.cpp
 )
 
 chipsec_test_vmm(
-    integration_cpuid_handler_multiple
+    integration_rdmsr_handler_multiple
     SOURCES handler_multiple.cpp
 )
 
 chipsec_test_vmm(
-    integration_cpuid_handler_vcpu_matches_hardware
+    integration_rdmsr_handler_vcpu_matches_hardware
     SOURCES handler_vcpu_matches_hardware.cpp
 )
 
 chipsec_test_vmm(
-    integration_cpuid_vmexit_leaf_and_subleaf
+    integration_rdmsr_vmexit_leaf_and_subleaf
     SOURCES vmexit_leaf_and_subleaf.cpp
 )

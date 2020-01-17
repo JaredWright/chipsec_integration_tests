@@ -35,11 +35,11 @@ bool handler(vcpu *vcpu)
     g_rcx = vcpu->rcx();
     g_rdx = vcpu->rdx();
 
-    vcpu->set_rax(cpuid::get_leaf(vcpu));
+    vcpu->set_rax(vcpu->cpuid_vmexit_leaf());
     vcpu->set_rbx(0);
-    vcpu->set_rcx(cpuid::get_subleaf(vcpu));
+    vcpu->set_rcx(vcpu->cpuid_vmexit_subleaf());
     vcpu->set_rdx(0);
-    cpuid::execute(vcpu);
+    vcpu->cpuid_execute();
 
     vcpu->advance();
     return true;
@@ -58,8 +58,8 @@ bool emulator(vcpu *vcpu)
 
 bool vcpu_init_nonroot(vcpu *vcpu)
 {
-    cpuid::add_handler(vcpu, 0x0, handler_delegate(handler));
-    cpuid::add_emulator(vcpu, 0xF00D, handler_delegate(emulator));
+    vcpu->cpuid_add_handler(0x0, handler);
+    vcpu->cpuid_add_emulator(0xF00D, emulator);
 
     return true;
 }

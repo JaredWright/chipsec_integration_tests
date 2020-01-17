@@ -23,44 +23,35 @@
 
 using namespace bfvmm::intel_x64;
 
-bool emulator_1(vcpu *vcpu)
+// Scenario:
+//
+// Register one handler for an existing MSR. The handler behaves as follows:
+//  - Increments a counter every time the handler runs
+//  - Does not modify the vcpu in any way
+//  - Returns false, yielding to the base rdmsr handler
+// 
+// The counter is exposed through a seperate msr emulator at a non-existent MSR
+//
+
+static uint32_t g_counter = 0;
+
+bool handler(vcpu *vcpu)
 {
-    vcpu->set_rax(0xBEEF);
+    counter++;
     return false;
 }
 
-bool emulator_2(vcpu *vcpu)
+bool emulator(vcpu *vcpu)
 {
-    vcpu->set_rbx(0xA55A);
-    return false;
-}
-
-bool emulator_3(vcpu *vcpu)
-{
-    vcpu->set_rcx(0x5AA5AA55);
-    return false;
-}
-
-bool emulator_4(vcpu *vcpu)
-{
-    vcpu->set_rdx(0xFFFFFFFF);
+    io_instruction::emulate(vcpu, g_counter);
     vcpu->advance();
     return true;
 }
 
-bool emulator_5(vcpu *vcpu)
-{
-    vcpu->set_rax(0xDEAD);
-    return false;
-}
-
 bool vcpu_init_nonroot(vcpu *vcpu)
 {
-    vcpu->cpuid_add_emulator(0xF00D, emulator_5);
-    vcpu->cpuid_add_emulator(0xF00D, emulator_4);
-    vcpu->cpuid_add_emulator(0xF00D, emulator_3);
-    vcpu->cpuid_add_emulator(0xF00D, emulator_2);
-    vcpu->cpuid_add_emulator(0xF00D, emulator_1);
+    io_out::add_handler(vcpu, 0xCFC, io_out::handler(handler));
+    io_in::add_emulator(vcpu, 0xCF8, io_in::handler(emulator));
 
     return true;
 }

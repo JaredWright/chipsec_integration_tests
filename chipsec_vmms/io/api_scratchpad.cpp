@@ -23,44 +23,39 @@
 
 using namespace bfvmm::intel_x64;
 
-bool emulator_1(vcpu *vcpu)
+bool handler(vcpu *vcpu)
 {
-    vcpu->set_rax(0xBEEF);
-    return false;
-}
+    vcpu->io_execute_in();  // pass-through the operation that caused the exit
+    vcpu->io_emulate_in(0xFFFFFFFF); // masked to the size of the current io exit
 
-bool emulator_2(vcpu *vcpu)
-{
-    vcpu->set_rbx(0xA55A);
-    return false;
-}
+    vcpu->io_execute_out();
+    vcpu->io_emulate_out(0xFFFF);
 
-bool emulator_3(vcpu *vcpu)
-{
-    vcpu->set_rcx(0x5AA5AA55);
-    return false;
-}
+    vcpu->io_vmexit_port_number();
+    vcpu->io_vmexit_port_size();
+    vcpu->io_vmexit_address();
+    vcpu->io_vmexit_type();
+    vcpu->io_vmexit_is_in();   // current VM exit caused by IN instruction variant
+    vcpu->io_vmexit_is_out();  // current VM exit caused by OUT instruction variant
+    vcpu->io_vmexit_is_read(); // current VM exit caused by MMIO read
+    vcpu->io_vmexit_is_write();// current VM exit caused by MMIO write
 
-bool emulator_4(vcpu *vcpu)
-{
-    vcpu->set_rdx(0xFFFFFFFF);
     vcpu->advance();
     return true;
 }
 
-bool emulator_5(vcpu *vcpu)
-{
-    vcpu->set_rax(0xDEAD);
-    return false;
-}
-
 bool vcpu_init_nonroot(vcpu *vcpu)
 {
-    vcpu->cpuid_add_emulator(0xF00D, emulator_5);
-    vcpu->cpuid_add_emulator(0xF00D, emulator_4);
-    vcpu->cpuid_add_emulator(0xF00D, emulator_3);
-    vcpu->cpuid_add_emulator(0xF00D, emulator_2);
-    vcpu->cpuid_add_emulator(0xF00D, emulator_1);
+    vcpu->io_add_out_handler(0xCF8, handler);
+    vcpu->io_add_out_emulator(0xCF8, handler);
+    vcpu->io_trap(0xCF8);
+
+    vcpu->io_add_in_handler(0xCFC, handler);
+    vcpu->io_add_in_emulator(0xCFC, handler);
+    vcpu->io_trap(0xCFC);
+
+    vcpu->io_vmexit_enable(0xCFC);
+    vcpu->io_vmexit_disable(0xCFC);
 
     return true;
 }

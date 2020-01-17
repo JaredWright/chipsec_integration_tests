@@ -34,15 +34,15 @@ bool handler(vcpu *vcpu)
 
 bool emulator(vcpu *vcpu)
 {
-    cpuid::emulate(vcpu, g_counter, 0, 0, 0);
+    vcpu->cpuid_emulate(g_counter, 0, 0, 0);
     vcpu->advance();
     return true;
 }
 
 bool vcpu_init_nonroot(vcpu *vcpu)
 {
-    cpuid::add_handler(vcpu, 0x0, handler_delegate(handler));
-    cpuid::add_emulator(vcpu, 0xF00D, handler_delegate(emulator));
+    vcpu->cpuid_add_handler(0x0, handler);
+    vcpu->cpuid_add_emulator(0xF00D, emulator);
 
     return true;
 }

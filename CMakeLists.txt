@@ -23,14 +23,15 @@ include(${CMAKE_CURRENT_LIST_DIR}/targets.cmake)
 
 include_dependency(CMAKE_CURRENT_LIST_DIR chipsec)
 
-userspace_extension(
-    chipsec_modules
+add_subproject(
+    chipsec_modules userspace
     DEPENDS chipsec
     SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/chipsec_modules
 )
 
-vmm_extension(
-    chipsec_vmms
+add_subproject(
+    chipsec_vmms vmm
     DEPENDS bfvmm
     SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/chipsec_vmms
 )
+

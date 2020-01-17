@@ -23,44 +23,41 @@
 
 using namespace bfvmm::intel_x64;
 
-bool emulator_1(vcpu *vcpu)
+bool handler(vcpu *vcpu)
 {
-    vcpu->set_rax(0xBEEF);
-    return false;
-}
+    vcpu->wrcr0_vmexit_value();
+    vcpu->wrcr0_execute();
 
-bool emulator_2(vcpu *vcpu)
-{
-    vcpu->set_rbx(0xA55A);
-    return false;
-}
+    vcpu->wrcr3_vmexit_value();
+    vcpu->wrcr3_execute();
 
-bool emulator_3(vcpu *vcpu)
-{
-    vcpu->set_rcx(0x5AA5AA55);
-    return false;
-}
+    vcpu->rdcr3_vmexit_value();
+    vcpu->rdcr3_execute();
+    vcpu->rdcr3_emulate(0xFFFFFFFF);
 
-bool emulator_4(vcpu *vcpu)
-{
-    vcpu->set_rdx(0xFFFFFFFF);
+    vcpu->wrcr4_vmexit_value();
+    vcpu->wrcr4_execute();
+
     vcpu->advance();
     return true;
 }
 
-bool emulator_5(vcpu *vcpu)
-{
-    vcpu->set_rax(0xDEAD);
-    return false;
-}
-
 bool vcpu_init_nonroot(vcpu *vcpu)
 {
-    vcpu->cpuid_add_emulator(0xF00D, emulator_5);
-    vcpu->cpuid_add_emulator(0xF00D, emulator_4);
-    vcpu->cpuid_add_emulator(0xF00D, emulator_3);
-    vcpu->cpuid_add_emulator(0xF00D, emulator_2);
-    vcpu->cpuid_add_emulator(0xF00D, emulator_1);
+    vcpu->wrcr0_add_handler(handler);
+    vcpu->wrcr0_add_emulator(handler);
+    vcpu->wrcr0_vmexit_enable();
+    vcpu->wrcr0_vmexit_disable();
+
+    vcpu->wrcr3_add_handler(handler);
+    vcpu->wrcr3_add_emulator(handler);
+    vcpu->wrcr3_vmexit_enable();
+    vcpu->wrcr3_vmexit_disable();
+
+    vcpu->rdcr3_add_handler(handler);
+    vcpu->rdcr3_add_emulator(handler);
+    vcpu->rdcr3_vmexit_enable();
+    vcpu->rdcr3_vmexit_disable();
 
     return true;
 }

@@ -23,44 +23,24 @@
 
 using namespace bfvmm::intel_x64;
 
-bool emulator_1(vcpu *vcpu)
+bool handler(vcpu *vcpu)
 {
-    vcpu->set_rax(0xBEEF);
-    return false;
-}
+    // Get the interrupt vector that caused the VM exit
+    vcpu->external_interrupt_vmexit_vector();
 
-bool emulator_2(vcpu *vcpu)
-{
-    vcpu->set_rbx(0xA55A);
-    return false;
-}
+    // Inject (queued if interrupt windows not open)
+    vcpu->external_interrupt_inject(0xa);
 
-bool emulator_3(vcpu *vcpu)
-{
-    vcpu->set_rcx(0x5AA5AA55);
-    return false;
-}
-
-bool emulator_4(vcpu *vcpu)
-{
-    vcpu->set_rdx(0xFFFFFFFF);
     vcpu->advance();
     return true;
 }
 
-bool emulator_5(vcpu *vcpu)
-{
-    vcpu->set_rax(0xDEAD);
-    return false;
-}
-
 bool vcpu_init_nonroot(vcpu *vcpu)
 {
-    vcpu->cpuid_add_emulator(0xF00D, emulator_5);
-    vcpu->cpuid_add_emulator(0xF00D, emulator_4);
-    vcpu->cpuid_add_emulator(0xF00D, emulator_3);
-    vcpu->cpuid_add_emulator(0xF00D, emulator_2);
-    vcpu->cpuid_add_emulator(0xF00D, emulator_1);
+    vcpu->external_interrupt_add_handler(handler_delegate_t::create<handler>());
+
+    vcpu->external_interrupt_vmexit_enable();
+    vcpu->external_interrupt_vmexit_disable();
 
     return true;
 }

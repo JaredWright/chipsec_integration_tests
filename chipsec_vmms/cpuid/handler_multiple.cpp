@@ -49,10 +49,10 @@ bool handler_4(vcpu *vcpu)
 
 bool vcpu_init_nonroot(vcpu *vcpu)
 {
-    cpuid::add_handler(vcpu, 0xF00D, handler_delegate(handler_4));
-    cpuid::add_handler(vcpu, 0xF00D, handler_delegate(handler_3));
-    cpuid::add_handler(vcpu, 0xF00D, handler_delegate(handler_2));
-    cpuid::add_handler(vcpu, 0xF00D, handler_delegate(handler_1));
+    vcpu->cpuid_add_handler(0xF00D, handler_4);
+    vcpu->cpuid_add_handler(0xF00D, handler_3);
+    vcpu->cpuid_add_handler(0xF00D, handler_2);
+    vcpu->cpuid_add_handler(0xF00D, handler_1);
 
     return true;
 }

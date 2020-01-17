@@ -23,44 +23,37 @@
 
 using namespace bfvmm::intel_x64;
 
-bool emulator_1(vcpu *vcpu)
-{
-    vcpu->set_rax(0xBEEF);
-    return false;
-}
+uint64_t g_rax = 0;
+uint64_t g_rdx = 0;
 
-bool emulator_2(vcpu *vcpu)
+bool handler(vcpu *vcpu)
 {
-    vcpu->set_rbx(0xA55A);
-    return false;
-}
+    g_rax = vcpu->rax();
+    g_rdx = vcpu->rdx();
 
-bool emulator_3(vcpu *vcpu)
-{
-    vcpu->set_rcx(0x5AA5AA55);
-    return false;
-}
+    vcpu->set_rax(vcpu->rdmsr_vmexit_address());
+    vcpu->rdmsr_execute();
 
-bool emulator_4(vcpu *vcpu)
-{
-    vcpu->set_rdx(0xFFFFFFFF);
     vcpu->advance();
     return true;
 }
 
-bool emulator_5(vcpu *vcpu)
+bool emulator(vcpu *vcpu)
 {
-    vcpu->set_rax(0xDEAD);
-    return false;
+    vcpu->set_rax(g_rax);
+    vcpu->set_rdx(g_rdx);
+
+    vcpu->advance();
+    return true;
 }
 
 bool vcpu_init_nonroot(vcpu *vcpu)
 {
-    vcpu->cpuid_add_emulator(0xF00D, emulator_5);
-    vcpu->cpuid_add_emulator(0xF00D, emulator_4);
-    vcpu->cpuid_add_emulator(0xF00D, emulator_3);
-    vcpu->cpuid_add_emulator(0xF00D, emulator_2);
-    vcpu->cpuid_add_emulator(0xF00D, emulator_1);
+    vcpu->rdmsr_add_handler(0x000000000000003B, handler_delegate_t::create<handler>());
+    vcpu->rdmsr_trap(0x000000000000003B);
+
+    vcpu->rdmsr_add_emulator(0x000000000000F00D, handler_delegate_t::create<emulator>());
+    vcpu->rdmsr_trap(0x000000000000F00D);
 
     return true;
 }

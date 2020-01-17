@@ -40,9 +40,9 @@ void hlt_delegate(bfobject *obj)
 
 bool vcpu_init_nonroot(vcpu *vcpu)
 {
-    cpuid::add_emulator(vcpu, 0xF00D, handler_delegate(emulator));
-    cpuid::add_handler(vcpu, 0xF00D, handler_delegate(handler));
-    vcpu->add_hlt_delegate(hlt_delegate_t::create<hlt_delegate>());
+    cpuid::add_emulator(vcpu, 0xF00D, emulator);
+    cpuid::add_handler(vcpu, 0xF00D, handler);
+    vcpu->add_hlt_delegate(hlt_delegate);
 
     return true;
 }

@@ -41,8 +41,8 @@ bool handler_1(vcpu *vcpu)
     leaf_internal_location = vcpu->gr1();
     subleaf_internal_location = vcpu->gr2();
 
-    leaf_at_handler_1 = cpuid::get_leaf(vcpu);
-    subleaf_at_handler_1 = cpuid::get_subleaf(vcpu);
+    leaf_at_handler_1 = vcpu->cpuid_vmexit_leaf();
+    subleaf_at_handler_1 = vcpu->cpuid_vmexit_subleaf();
 
     vcpu->set_rax(0xFFFFFFFF);
     vcpu->set_rbx(0xFFFFFFFF);
@@ -54,8 +54,8 @@ bool handler_1(vcpu *vcpu)
 
 bool handler_2(vcpu *vcpu)
 {
-    leaf_at_handler_2 = cpuid::get_leaf(vcpu);
-    subleaf_at_handler_2 = cpuid::get_subleaf(vcpu);
+    leaf_at_handler_2 = vcpu->cpuid_vmexit_leaf();
+    subleaf_at_handler_2 = vcpu->cpuid_vmexit_subleaf();
 
     vcpu->advance();
     return true;
@@ -96,12 +96,12 @@ bool emulator_5(vcpu *vcpu)
 
 bool vcpu_init_nonroot(vcpu *vcpu)
 {
-    cpuid::add_emulator(vcpu, 0xF00D, handler_delegate(handler_2));
-    cpuid::add_emulator(vcpu, 0xF00D, handler_delegate(handler_1));
+    vcpu->cpuid_add_emulator(0xF00D, handler_2);
+    vcpu->cpuid_add_emulator(0xF00D, handler_1);
 
-    cpuid::add_emulator(vcpu, 0xBEEF1, handler_delegate(emulator_3));
-    cpuid::add_emulator(vcpu, 0xBEEF2, handler_delegate(emulator_4));
-    cpuid::add_emulator(vcpu, 0xBEEF3, handler_delegate(emulator_5));
+    vcpu->cpuid_add_emulator(0xBEEF1, emulator_3);
+    vcpu->cpuid_add_emulator(0xBEEF2, emulator_4);
+    vcpu->cpuid_add_emulator(0xBEEF3, emulator_5);
 
     return true;
 }

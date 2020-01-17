@@ -23,7 +23,7 @@
 
 using namespace bfvmm::intel_x64;
 
-bool emulator_1(vcpu *vcpu)
+bool emulator(vcpu *vcpu)
 {
     vcpu->advance();
     return true;
@@ -31,6 +31,6 @@ bool emulator_1(vcpu *vcpu)
 
 bool vcpu_init_nonroot(vcpu *vcpu)
 {
-    cpuid::add_emulator(vcpu, 0, handler_delegate(emulator_1));
+    vcpu->cpuid_add_emulator(0, emulator);
     return true;
 }

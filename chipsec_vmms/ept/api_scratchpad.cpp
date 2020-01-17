@@ -23,44 +23,32 @@
 
 using namespace bfvmm::intel_x64;
 
-bool emulator_1(vcpu *vcpu)
+bool handler(vcpu *vcpu)
 {
-    vcpu->set_rax(0xBEEF);
-    return false;
-}
+    vcpu->ept_vmexit_gpa();
+    vcpu->ept_vmexit_gva();
+    vcpu->ept_vmexit_is_read();
+    vcpu->ept_vmexit_is_write();
+    vcpu->ept_vmexit_is_execute();
+    vcpu->ept_vmexit_is_misconfiguration();
+    vcpu->ept_vmexit_is_violation();
 
-bool emulator_2(vcpu *vcpu)
-{
-    vcpu->set_rbx(0xA55A);
-    return false;
-}
+    vcpu->ept_map_4k(0xF00D, 0xBEEF);
+    vcpu->ept_map_2m(0xF00D, 0xBEEF);
+    vcpu->ept_map_1g(0xF00D, 0xBEEF);
+    vcpu->ept_unmap(0xF00D);
+    vcpu->ept_set_mmap(mmap);
+    vcpu->ept_enable();
+    vcpu->ept_disable();
 
-bool emulator_3(vcpu *vcpu)
-{
-    vcpu->set_rcx(0x5AA5AA55);
-    return false;
-}
-
-bool emulator_4(vcpu *vcpu)
-{
-    vcpu->set_rdx(0xFFFFFFFF);
     vcpu->advance();
     return true;
 }
 
-bool emulator_5(vcpu *vcpu)
-{
-    vcpu->set_rax(0xDEAD);
-    return false;
-}
-
 bool vcpu_init_nonroot(vcpu *vcpu)
 {
-    vcpu->cpuid_add_emulator(0xF00D, emulator_5);
-    vcpu->cpuid_add_emulator(0xF00D, emulator_4);
-    vcpu->cpuid_add_emulator(0xF00D, emulator_3);
-    vcpu->cpuid_add_emulator(0xF00D, emulator_2);
-    vcpu->cpuid_add_emulator(0xF00D, emulator_1);
+    vcpu->ept_add_misconfiguration_handler(handler);
+    vcpu->ept_add_violation_handler(handler);
 
     return true;
 }

@@ -31,36 +31,23 @@ bool emulator_1(vcpu *vcpu)
 
 bool emulator_2(vcpu *vcpu)
 {
-    vcpu->set_rbx(0xA55A);
-    return false;
-}
-
-bool emulator_3(vcpu *vcpu)
-{
-    vcpu->set_rcx(0x5AA5AA55);
-    return false;
-}
-
-bool emulator_4(vcpu *vcpu)
-{
-    vcpu->set_rdx(0xFFFFFFFF);
+    vcpu->set_rdx(0xF00D);
     vcpu->advance();
     return true;
 }
 
-bool emulator_5(vcpu *vcpu)
+bool emulator_3(vcpu *vcpu)
 {
     vcpu->set_rax(0xDEAD);
+    vcpu->set_rdx(0xDEAD);
     return false;
 }
 
 bool vcpu_init_nonroot(vcpu *vcpu)
 {
-    vcpu->cpuid_add_emulator(0xF00D, emulator_5);
-    vcpu->cpuid_add_emulator(0xF00D, emulator_4);
-    vcpu->cpuid_add_emulator(0xF00D, emulator_3);
-    vcpu->cpuid_add_emulator(0xF00D, emulator_2);
-    vcpu->cpuid_add_emulator(0xF00D, emulator_1);
-
+    vcpu->rdmsr_add_emulator(0x000000000000003B, handler_delegate_t::create<emulator_3>());
+    vcpu->rdmsr_add_emulator(0x000000000000003B, handler_delegate_t::create<emulator_2>());
+    vcpu->rdmsr_add_emulator(0x000000000000003B, handler_delegate_t::create<emulator_1>());
+    vcpu->rdmsr_trap(0x000000000000003B);
     return true;
 }
